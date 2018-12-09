@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const inputFileName = "./input.txt"
+const inputFileName = "../input.txt"
 
 type key struct {
 	index  int

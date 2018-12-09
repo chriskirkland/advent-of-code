@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	inputFileName = "./input.txt"
-	size = 2000
+	inputFileName = "../input.txt"
+	size          = 2000
 )
 
 var claimRe = regexp.MustCompile(`#(\d+) @ (\d+),(\d+): (\d+)x(\d+)`)
@@ -63,10 +63,10 @@ func newClaim(line string) claim {
 		panic(fmt.Errorf("invalid number of matches for line '%s': %d. Expected 6", line, len(matches)))
 	}
 
-	return claim {
-		x: mustConvert(matches[2]),
-		y: mustConvert(matches[3]),
-		width: mustConvert(matches[4]),
+	return claim{
+		x:      mustConvert(matches[2]),
+		y:      mustConvert(matches[3]),
+		width:  mustConvert(matches[4]),
 		height: mustConvert(matches[5]),
 	}
 }
@@ -74,7 +74,7 @@ func newClaim(line string) claim {
 func mustConvert(s string) int {
 	v, err := strconv.Atoi(s)
 	if err != nil {
-		panic("failed conversion of string to int: "+s)
+		panic("failed conversion of string to int: " + s)
 	}
 
 	return v

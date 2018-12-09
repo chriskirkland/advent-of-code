@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	inputFileName = "./input.txt"
-	size = 2000
+	inputFileName = "../input.txt"
+	size          = 2000
 
 	// sentinel for a fabric square which was claimed two or more times
 	conflict = -1
@@ -43,7 +43,7 @@ func main() {
 		c.mark(&fabric, false)
 	}
 
-	if num := len(uniqs); num != 1  {
+	if num := len(uniqs); num != 1 {
 		panic(fmt.Errorf("unexpected number of unconflicted claims: %d", num))
 	}
 
@@ -101,11 +101,11 @@ func newClaim(line string) claim {
 		panic(fmt.Errorf("invalid number of matches for line '%s': %d. Expected 6", line, len(matches)))
 	}
 
-	return claim {
-		id: mustConvert(matches[1]),
-		x: mustConvert(matches[2]),
-		y: mustConvert(matches[3]),
-		width: mustConvert(matches[4]),
+	return claim{
+		id:     mustConvert(matches[1]),
+		x:      mustConvert(matches[2]),
+		y:      mustConvert(matches[3]),
+		width:  mustConvert(matches[4]),
 		height: mustConvert(matches[5]),
 	}
 }
@@ -113,7 +113,7 @@ func newClaim(line string) claim {
 func mustConvert(s string) int {
 	v, err := strconv.Atoi(s)
 	if err != nil {
-		panic("failed conversion of string to int: "+s)
+		panic("failed conversion of string to int: " + s)
 	}
 
 	return v

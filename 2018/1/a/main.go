@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const inputFileName = "./input.txt"
+const inputFileName = "../input.txt"
 
 func main() {
 	dat, err := ioutil.ReadFile(inputFileName)

@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	inputFileName = "./input.txt"
+	inputFileName = "../input.txt"
 
-	timeFormat     = "2006-01-02 15:04"
+	timeFormat = "2006-01-02 15:04"
 )
 
 var shiftRe = regexp.MustCompile(`Guard #(\d+) begins shift`)
@@ -44,8 +44,8 @@ func main() {
 		//fmt.Printf("'%s' at %v\n", action, t)
 
 		switch action {
-		case "falls asleep"	:
-			startTime =  t
+		case "falls asleep":
+			startTime = t
 
 		case "wakes up":
 			sleeps[id][60] += t.Minute() - startTime.Minute()
@@ -79,7 +79,7 @@ func main() {
 		}
 	}
 
-	fmt.Printf("guard %d at minute %d (%d times) = %d\n", maxGuard, sleeps[maxGuard][60], sleeps[maxGuard][61], maxGuard * sleeps[maxGuard][60])
+	fmt.Printf("guard %d at minute %d (%d times) = %d\n", maxGuard, sleeps[maxGuard][60], sleeps[maxGuard][61], maxGuard*sleeps[maxGuard][60])
 }
 
 func check(err error) {
