@@ -1,6 +1,6 @@
 # Let 
 #   OC = opponent's choice (0 = Rock/1 = Paper/2 = Scissors)
-#   MC = my's choice
+#   MC = my choice
 #   R  = result (0 = loss/1 = draw/2 = win)
 # Then
 #   R  = (MC - OC + 1) mod 3
