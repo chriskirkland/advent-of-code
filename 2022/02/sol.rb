@@ -2,9 +2,9 @@
 #   OC = opponent's choice (0 = Rock/1 = Paper/2 = Scissors)
 #   MC = my's choice
 #   R  = result (0 = loss/1 = draw/2 = win)
-# Then:
-#   R = (MC-OC+1) mod 3
-# so reversing
+# Then
+#   R  = (MC - OC + 1) mod 3
+# And
 #   MC = (OC + R - 1) mod 3
 
 def score_p1(game)
@@ -15,7 +15,7 @@ end
 
 def score_p2(game)
     oc, r = game[0], game[1]
-    mc = (oc+r+2)%3  # +2 = -1 mod 3
+    mc = (oc + r + 2) % 3  # 2 = -1 mod 3
     return 3 * r + mc + 1
 end
 
