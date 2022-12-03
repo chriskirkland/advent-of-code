@@ -1,5 +1,3 @@
-require 'set'
-
 data = File.read('input.txt').split("\n").map(&:chars)
 
 SCORE = Hash[('a'..'z').zip(1..26) + ('A'..'Z').zip(27..52)]
