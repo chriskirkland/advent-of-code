@@ -1,3 +1,5 @@
+# https://adventofcode.com/2022/day/6
+#
 def solve(k, seq)
     seqc = seq.chars
     n = seqc.length
