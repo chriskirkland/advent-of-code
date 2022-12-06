@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+require "net/http"
+
+SESSION_COOKIE = ENV["AOC_SESSION"]
+
+day = ARGV[0].to_i
+raise "😢 expected integer day but got #{ARGV[0]}" unless day > 0
+
+puts "» setting up AoC day #{day}"
+
+### CREATE DIRECTORY
+dir = day.to_s.rjust(2, "0")
+unless Dir.exists? dir
+  Dir.mkdir(dir)
+  puts "✓ created dir #{dir}"
+end
+
+### DOWNLOAD INPUT
+input_file = File.join(dir, "input.txt")
+unless File.exists? input_file
+  raise "😢 SESSION_COOKIE not present. run \n\tsource .env" if SESSION_COOKIE.nil?
+
+  uri = URI("https://adventofcode.com/2022/day/#{day}/input")
+  req = Net::HTTP::Get.new(uri)
+  req["Cookie"] = "session=#{SESSION_COOKIE}"
+  resp = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+    http.request(req)
+  end
+  if resp.code != "200"
+    raise "😢 failed to get input:\n[HTTP #{resp.code}] #{resp.message}"
+  end
+
+  File.open(input_file, "w") do |file|
+    file.write(resp.body)
+  end
+
+  puts "✓ input downloaded"
+end
+
+
+### SETUP TEMPLATE
+CODE_TEMPLATE = """
+# https://adventofcode.com/2022/day/#{day}
+$data = File.read(\"input.txt\").split(\"\\n\")
+
+""".lstrip
+
+code_file = File.join(dir, "sol.rb")
+unless File.exists? code_file
+  File.open(code_file, 'w') do |file|
+    file.write(CODE_TEMPLATE)
+  end
+  puts "✓ ruby template created"
+end
+
+puts "\n🚀 GOOOOO! 🚀\n"
