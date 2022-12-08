@@ -49,9 +49,7 @@ visible = 2 * (N+M-2) # borders are visible
 (1..(N-2)).each do |i|
     (1..(M-2)).each do |j|
         [UP, LEFT, DOWN, RIGHT].each do |dir|
-            #puts "checking (#{i},#{j}) from #{dirs[dir]}"
             if $grid[i][j] > vhf[dir][i][j]
-                #puts "(#{i},#{j}) #{$grid[i][j]} visibile from #{dirs[dir]}"
                 visible += 1
                 break
             end
@@ -94,8 +92,7 @@ max = 0
     (1..(M-2)).each do |j|
         score = 1
         dirs.each_with_index do |dir, d|
-            dscore = find_dist(d, i, j)
-            score *= dscore
+            score *= find_dist(d, i, j)
         end
         if score > max
             max = score 
