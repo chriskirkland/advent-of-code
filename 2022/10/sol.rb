@@ -1,5 +1,5 @@
 # https://adventofcode.com/2022/day/10
-$data = File.read("input.txt").split("\n").map{ _1.split(" ") }
+$data = File.read("input.txt").split("\n").map(&:split)
 
 # generate values of x register at each clock cycle
 x = 1
