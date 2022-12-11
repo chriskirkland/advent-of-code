@@ -2,7 +2,7 @@
 $data = File.read("input.txt").split("\n\n")
 
 class Monkey
-    attr_reader :items, :inspections
+    attr_reader :items, :inspections, :quot
     def initialize(expr, quot, pass_to, fail_to)
         @items = []
         @inspections = 0
@@ -12,25 +12,24 @@ class Monkey
         @fail_to = fail_to
     end
 
-    def operation(val, div: 3)
-        puts "expression: #{@expr}"
+    def operation(val, mod: nil)
         op1, operator, op2 = @expr.map { |op| 
             next val if op == "old"
             next op if "+*".include?(op)
             op.to_i
         }
-        puts "executing: #{op1} #{operator} #{op2}"
-        op1.send(operator.to_sym, op2) / 3
+        tval = op1.send(operator.to_sym, op2)
+        return tval % mod if mod
+        tval / 3
     end
 
     def test(val)
         val % @quot == 0 ? @pass_to : @fail_to
     end
 
-    def inspect(val)
+    def inspect(val, mod: nil)
         @inspections += 1
-        nval = operation(val)
-        puts "new value: #{nval}"
+        nval = operation(val, mod: mod)
         to = test(nval)
         [nval, to]
     end
@@ -38,16 +37,12 @@ class Monkey
     def self.build(config)
         lines = config.split("\n")
         expr = lines[2].split("=")[1].split
-        puts "expression: #{expr}"
         quot = lines[3].split(" ")[-1].to_i
-        puts "quot: #{quot}"
         true_to = lines[4].split(" ")[-1].to_i
         false_to = lines[5].split(" ")[-1].to_i
-        puts "true_to: #{true_to}, false_to: #{false_to}"
         monkey = new(expr, quot, true_to, false_to)
 
         lines[1].split(":")[-1].split(",").map(&:to_i).each do |item|
-            puts "adding item #{item}" 
             monkey.items.push item
         end
         monkey
@@ -60,27 +55,25 @@ def print_state(monkeys)
     end
 end
 
-puts "=== BUILDING MONKEYS ==="
-monkeys = $data.map {|config| Monkey.build(config)}
-print_state(monkeys)
-puts
-puts "=== RUNNING MONKEYS ==="
-
-20.times do |round|
-    monkeys.each_with_index do |monkey, ix|
-        n = monkey.items.count
-        n.times do
-            item = monkey.items.shift
-            puts "[Monkey #{ix}] inspecting item #{item}"
-
-            nval, to = monkey.inspect(item)
-            monkeys[to].items.push nval
-            puts "[Monkey #{ix}] items after #{monkey.items.join(", ")}"
+def solve(monkeys, rounds, cap: nil)
+    rounds.times do |round|
+        monkeys.each_with_index do |monkey, ix|
+            n = monkey.items.count
+            n.times do
+                item = monkey.items.shift
+                nval, to = monkey.inspect(item, mod: cap)
+                monkeys[to].items.push nval
+            end
         end
-        puts 
     end
-    puts "After round #{round+1}, the monkeys are holding items with these worry levels:"
-    print_state(monkeys)
+    monkeys.map(&:inspections).max(2).reduce(:*)
 end
 
-puts monkeys.map(&:inspections).max(2).reduce(:*)
+# part 1
+monkeys = $data.map {|config| Monkey.build(config)}
+puts solve(monkeys, 20)
+
+# part 2
+monkeys = $data.map {|config| Monkey.build(config)}
+lcm = monkeys.map(&:quot).reduce(1, :lcm)
+puts solve(monkeys, 10000, cap: lcm)
