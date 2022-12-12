@@ -24,18 +24,14 @@ def solve(*goals)
     while queue.count > 0
         x, y = queue.shift
 
-        is_candidate = ->(nx, ny) {
-            grid[nx][ny] <= grid[x][y] + 1 && dist[x][y]+1 < dist[nx][ny]
-        }
-        visit = ->(nx, ny) {
+        [[x-1, y], [x+1, y], [x, y-1], [x, y+1]].each do |nx, ny|
+            next unless nx >= 0 && nx <= n-1 && ny >= 0 && ny <= m-1 # boundary checks
+            next unless grid[nx][ny] <= grid[x][y] + 1 # can only climb 1 unit
+            next unless dist[x][y]+1 < dist[nx][ny] # this path is shorter than previous paths
+
             dist[nx][ny] = dist[x][y]+1 
             queue.push [nx, ny]
-        }
-
-        visit.call(x-1, y) if x > 0 && is_candidate.call(x-1, y)
-        visit.call(x+1, y) if x < n-1 && is_candidate.call(x+1, y)
-        visit.call(x, y-1) if y > 0 && is_candidate.call(x, y-1)
-        visit.call(x, y+1) if y < m-1 && is_candidate.call(x, y+1)
+        end
     end
 
     find_all(*goals).map{ |x, y| dist[x][y] }.min
