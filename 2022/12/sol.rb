@@ -3,7 +3,6 @@ $input = File.read("input.txt").split("\n").map(&:chars)
 heights = ('a'..'z').zip(26.downto(1)).to_h.merge({'S' => 26, 'E' => 1})
 $grid = $input.map{ |row| row.map{ heights[_1]}}
 
-
 N = $input.count
 M = $input[0].count
 
