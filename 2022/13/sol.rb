@@ -1,5 +1,5 @@
 # https://adventofcode.com/2022/day/13
-$data = File.read("input.txt").split("\n\n").map{ _1.split("\n") }
+$data = File.read("input.txt").squeeze("\n").split("\n").map(&:strip).map { eval(_1) }
 
 # -1 if a < b, 0 if a == b, 1 if a > b
 def cmp(a, b)
@@ -19,14 +19,13 @@ def cmp(a, b)
 end
 
 # part 1
-puts $data.each_with_index.map { |pair, ix|
-    l, r = eval(pair[0]), eval(pair[1])
-    ix+1 if cmp(l,r) <= 0
+puts $data.each_slice(2).with_index.map { |(l, r), ix|
+    ix+1 if cmp(l, r) <= 0
 }.compact.sum
 
 # part 2
 d1, d2 = [[2]], [[6]]
-all = $data.flatten(1).map{eval(_1)}.push(d1).push(d2).sort { |a, b| cmp(a, b) }
-puts all.each_with_index.map { |packet, ix| 
-    ix+1 if packet == d1 || packet == d2 
-}.compact.inject(:*)
+signal = $data.push(d1).push(d2)
+d1ix = signal.map{ cmp(_1, d1) }.count(-1)
+d2ix = signal.map{ cmp(_1, d2) }.count(-1) 
+puts (d1ix+1) * (d2ix+1)
