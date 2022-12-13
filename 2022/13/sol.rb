@@ -1,5 +1,6 @@
 # https://adventofcode.com/2022/day/13
-$data = File.read("input.txt").squeeze("\n").split("\n").map(&:strip).map { eval(_1) }
+require 'json'
+$data = File.read("input.txt").squeeze("\n").split("\n").map(&:strip).map { JSON.parse(_1) }
 
 # -1 if a < b, 0 if a == b, 1 if a > b
 def cmp(a, b)
