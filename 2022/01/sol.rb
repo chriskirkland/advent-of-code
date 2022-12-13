@@ -1,15 +1,5 @@
-packs = []
-curr = 0
-File.open('input.txt').each do |line|
-    if line.strip == ""
-        packs.push curr
-        curr = 0
-        next
-    end
-
-    curr += line.to_i
-end
-packs.sort!.reverse!
-
+# https://adventofcode.com/2022/day/1
+$data = File.read("input.txt").split("\n\n").map{_1.split("\n").map(&:to_i)}
+packs = $data.map(&:sum).sort.reverse
 puts packs[0]
-puts packs[0] + packs[1] + packs[2]
+puts packs.take(3).sum
