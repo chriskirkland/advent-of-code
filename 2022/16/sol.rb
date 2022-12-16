@@ -1,9 +1,10 @@
 # https://adventofcode.com/2022/day/16
 require 'set'
-$data = File.read("sample.txt").split("\n")
+$data = File.read("input.txt").split("\n")
 
 $flow = {}
 $adj = Hash.new { |h,k| h[k] = Set.new }
+$edges = Hash.new { |h,k| h[k] = {} }
 START = "AA"
 
 # mark the initial edges
@@ -20,7 +21,6 @@ end
 $valuable = $flow.keys.select { |k| $flow[k] > 0 }
 
 # DFS from each node to find min distance between each pair of nodes
-$edges = Hash.new { |h,k| h[k] = {} }
 $adj.keys.each do |start|
     $edges[start][start] = 0
     paths = $adj[start].map { |v| [[start, v], 1] unless v == start }.compact
@@ -39,56 +39,43 @@ $adj.keys.each do |start|
     end
 end
 
-puts "reducing the edges to only valuable ones + the starting point"
 $edges = $edges.select { |k,v| $valuable.include?(k) || k == START }
 $edges = $edges.map { |k,v| 
     [k, v.select { |k2,v2| $valuable.include?(k2) }] 
 }.to_h
 
-def print_path(path)
-    puts "Path: #{path.join(" -> ")}"
-    tflow, rflow = 0, 0
-    tstart = 1
-    while path.any?
-        v = path.shift
-        if path.any?
-            tend = tstart + $edges[v][path.first] + 1
-        else 
-            tend = 30
+def solve(interesting, time: 30)
+    # (path, timeleft, flow value of path so far)
+    paths = [[[START], time, 0]]
+    maxp = []
+    p1 = 0
+    while paths.any?
+        path, tleft, flow = paths.shift
+        if flow > p1
+            p1 = flow
+            maxp = path
         end
 
-        rflow += $flow[v]
-        tflow += (tend-tstart) * rflow
-        (tend-tstart).times do |t|
-            puts "#{rflow}"
+        left_to_try = interesting-path
+        left_to_try.each do |v|
+            ntleft = tleft - $edges[path.last][v] - 1
+            next if ntleft <= 0
+            nflow = flow + ntleft * $flow[v]
+            paths.push [path+[v], ntleft, nflow]
         end
-        #puts "== Minute #{tstart} to #{tend-1}"
-        #puts "Valve #{v}"
-        #puts "New flow rate is #{rflow}"
-        #puts "Total flow is #{tflow} at minute #{tend-1}"
-        tstart = tend
     end
-    puts #{rflow}
+    p1
 end
 
-puts "calculating max flow path"
-# (path, timeleft, flow value of path so far)
-paths = [[[START], 30, 0]]
-maxp = []
-p1 = 0
-while paths.any?
-    path, tleft, flow = paths.shift
-    if flow > p1
-        p1 = flow
-        maxp = path
-    end
+# part 1
+puts solve($valuable)
 
-    left_to_try = $valuable-path
-    left_to_try.each do |v|
-        ntleft = tleft - $edges[path.last][v] - 1
-        next if ntleft <= 0
-        nflow = flow + ntleft * $flow[v]
-        paths.push [path+[v], ntleft, nflow]
+# part 2
+max = 0
+1.upto($valuable.length/2) do |n|
+    $valuable.combination(n).each do |mine|
+        v = solve(mine, time: 26) + solve($valuable-mine, time: 26)
+        max = v if v > max
     end
 end
-puts p1
+puts max
