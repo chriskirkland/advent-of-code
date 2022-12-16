@@ -33,12 +33,12 @@ $adj.keys.each do |start|
         end
 
         $adj[v].each do |nxt| 
-            next if p.include? nxt
-            paths.push [p+[nxt], w+1] 
+            paths.push [p+[nxt], w+1] unless p.include? nxt
         end
     end
 end
 
+# compact edges to only include valuable nodes (mostly for debugging)
 $edges = $edges.select { |k,v| $valuable.include?(k) || k == START }
 $edges = $edges.map { |k,v| 
     [k, v.select { |k2,v2| $valuable.include?(k2) }] 
@@ -47,17 +47,12 @@ $edges = $edges.map { |k,v|
 def solve(interesting, time: 30)
     # (path, timeleft, flow value of path so far)
     paths = [[[START], time, 0]]
-    maxp = []
     p1 = 0
     while paths.any?
         path, tleft, flow = paths.shift
-        if flow > p1
-            p1 = flow
-            maxp = path
-        end
+        p1 = [flow, p1].max
 
-        left_to_try = interesting-path
-        left_to_try.each do |v|
+        (interesting-path).each do |v|
             ntleft = tleft - $edges[path.last][v] - 1
             next if ntleft <= 0
             nflow = flow + ntleft * $flow[v]
