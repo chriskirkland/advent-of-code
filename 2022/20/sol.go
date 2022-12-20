@@ -3,11 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 )
 
-var inputFile string = "sample.txt"
+const key = 811589153
+
+var inputFile string = "input.txt"
 
 func must(err error) {
 	if err != nil {
@@ -55,59 +58,81 @@ func (f *file) Size() int {
 	return len(f.Nodes)
 }
 
-func (f *file) Mix() {
-	for _, ntm := range f.Nodes {
-		//fmt.Println("=== mixing", ntm.Value)
+func (f *file) RingSize() int {
+	s := 1
+	for curr := f.Nodes[0].Next; curr != f.Nodes[0]; curr = curr.Next {
+		s++
+	}
+	return s
+}
 
-		v := ntm.Value
-		if v < 0 {
-			//  generate the corresponding value [0, f.Size())
-			v -= 1
-			for v < 0 {
-				v += f.Size()
-			}
+func (f *file) Mix() {
+	mod := f.Size() - 1
+	for _, ntm := range f.Nodes {
+		steps := ntm.Value
+
+		//  generate the corresponding value [0, f.Size()-1)
+		if steps < 0 {
+			quot := math.Floor(float64(steps) / float64(mod))
+			steps += int(math.Abs(quot)) * mod
 		} else {
-			// generate the corresponding value [0, f.Size())
-			v %= f.Size()
+			steps %= mod
 		}
-		if v == 0 {
-			//fmt.Println("no need to move; ", ntm.Value, "is the same as 0")
-			continue
+		if steps == 0 {
+			continue // noop
 		}
-		//fmt.Println("changed", ntm.Value, "to", v, "moves to the right")
 
 		// swap right 'v' places
 		p := ntm
-		for i := 0; i < v; i++ {
+		for i := 0; i < steps; i++ {
 			p = p.Next
 		}
 		n := p.Next
-		//fmt.Println("moving", ntm.Value, "between", p.Value, "and", n.Value)
 
 		// remove node from the list
 		ntm.Prev.Next, ntm.Next.Prev = ntm.Next, ntm.Prev
 		// insert node between p and n
 		ntm.Next, ntm.Prev, p.Next, n.Prev = n, p, ntm, ntm
-
-		//fmt.Println(f.State())
-		//fmt.Println()
 	}
 }
 
-func (f *file) AfterZero(n int) int {
+func (f *file) GroveScore() int {
 	// find zero
 	zero := f.Nodes[0]
 	for zero.Value != 0 {
 		zero = zero.Next
 	}
 
-	// move n places to the right
-	n %= len(f.Nodes)
+	// move "1000" steps to the right 3 times
+	score := 0
+	n := 1000 % f.Size()
 	target := zero
-	for i := 0; i < n; i++ {
-		target = target.Next
+	for t := 0; t < 3; t++ {
+		for i := 0; i < n; i++ {
+			target = target.Next
+		}
+		score += target.Value
 	}
-	return target.Value
+	return score
+}
+
+func p1(vs []int) int {
+	file := NewFile(vs)
+	file.Mix()
+	return file.GroveScore()
+}
+
+func p2(vs []int) int {
+	for ix := 0; ix < len(vs); ix++ {
+		vs[ix] *= key
+	}
+
+	file := NewFile(vs)
+	for i := 0; i < 10; i++ {
+		file.Mix()
+	}
+
+	return file.GroveScore()
 }
 
 func main() {
@@ -125,13 +150,6 @@ func main() {
 	}
 	must(scanner.Err())
 
-	file := NewFile(vs)
-	//fmt.Println(file.State())
-	//fmt.Println()
-
-	file.Mix()
-
-	fmt.Println(file.AfterZero(1000))
-	fmt.Println(file.AfterZero(2000))
-	fmt.Println(file.AfterZero(3000))
+	fmt.Println("Part 1:", p1(vs))
+	fmt.Println("Part 2:", p2(vs))
 }
