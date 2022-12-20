@@ -46,8 +46,12 @@ type file struct {
 	Nodes []*node
 }
 
+func (f *file) Head() *node {
+	return f.Nodes[0]
+}
+
 func (f *file) State() []int {
-	head := f.Nodes[0]
+	head := f.Head()
 	s := []int{head.Value}
 	for curr := head.Next; curr != head; curr = curr.Next {
 		s = append(s, curr.Value)
@@ -60,7 +64,8 @@ func (f *file) Size() int {
 
 func (f *file) RingSize() int {
 	s := 1
-	for curr := f.Nodes[0].Next; curr != f.Nodes[0]; curr = curr.Next {
+	head := f.Head()
+	for curr := head.Next; curr != head; curr = curr.Next {
 		s++
 	}
 	return s
@@ -98,7 +103,7 @@ func (f *file) Mix() {
 
 func (f *file) GroveScore() int {
 	// find zero
-	zero := f.Nodes[0]
+	zero := f.Head()
 	for zero.Value != 0 {
 		zero = zero.Next
 	}
