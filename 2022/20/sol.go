@@ -71,7 +71,7 @@ func (f *file) Mix() {
 	for _, ntm := range f.Nodes {
 		steps := ntm.Value
 
-		//  generate the corresponding value [0, f.Size()-1)
+		//  generate the corresponding value in [0, f.Size()-1)
 		if steps < 0 {
 			quot := math.Floor(float64(steps) / float64(mod))
 			steps += int(math.Abs(quot)) * mod
@@ -82,7 +82,7 @@ func (f *file) Mix() {
 			continue // noop
 		}
 
-		// swap right 'v' places
+		// find the nodes to the left and right of the new location
 		p := ntm
 		for i := 0; i < steps; i++ {
 			p = p.Next
