@@ -26,10 +26,6 @@ end
 
 def p1
     monkeys = get_monkeys()
-    #$data.each do |monkey, expr|
-    #    puts "#{monkey} = #{expr}"
-    #end
-    
     calc(monkeys, "root")
 end
 
