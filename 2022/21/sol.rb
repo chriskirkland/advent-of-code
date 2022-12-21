@@ -1,6 +1,5 @@
 # https://adventofcode.com/2022/day/21
 $data = File.read("input.txt").split("\n")
-DEBUG = true
 
 def get_monkeys()
     $data.map { |line|
@@ -22,7 +21,6 @@ def calc(monkeys, monkey)
     op = expr[1]
     v1, v2 = calc(monkeys, expr[0]), calc(monkeys, expr[2])
     v = v1.public_send(op, v2)
-    puts "#{monkey} := #{v}" if DEBUG
     monkeys[monkey] = v
 end
 
@@ -58,7 +56,6 @@ def p2
     if contains?(monkeys, l, ME)
         unsolved, solved = l, r
     end
-    puts "solved: #{solved}, unsolved: #{unsolved}" if DEBUG
 
     # calculate the value of the solved half
     val = calc(monkeys, solved)
@@ -67,34 +64,22 @@ def p2
     curr = unsolved
     while curr != ME
         l, op, r = monkeys[curr]
-        puts "working back from #{curr} (val=#{val})" if DEBUG
-        puts "  #{val} = #{l} #{op} #{r}" if DEBUG
         if contains?(monkeys, l, ME)
-            puts "  #{l} contains #{ME}" if DEBUG
             v = calc(monkeys, r)
-            puts "  #{r} = #{v}" if DEBUG
-            puts "  doing #{val} #{INVERSE[op]} #{v}" if DEBUG
             val = val.public_send(INVERSE[op], v)
             curr = l
         else
-            puts "  #{r} contains #{ME}" if DEBUG
             v = calc(monkeys, l)
-            puts "  #{l} = #{v}" if DEBUG
             if ["+", "*"].include? op
-                puts "  doing #{val} #{INVERSE[op]} #{v}" if DEBUG
                 val = val.public_send(INVERSE[op], v)
             else
-                puts "  doing #{v} #{op} #{val}" if DEBUG
                 val = v.public_send(op, val)
             end
             curr = r
         end
-        puts if DEBUG
     end
     val
 end
 
-puts "==== PART 1 ===="
 puts p1
-puts "==== PART 2 ===="
 puts p2
