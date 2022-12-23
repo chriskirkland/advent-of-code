@@ -57,8 +57,8 @@ $check_move = [
     [[E, NE, SE], E]
 ]
 
-10.times do |round|
-    debug "=== ROUND #{round+1} ==="
+1000000.times do |round|
+    puts "=== ROUND #{round+1} ==="
     debug "priorities: #{$check_move.map { |_, dir| DIR_TO_SYM[dir] }.join ' > '}"
     # generate each elf's would-be position
     moves = Hash.new { |h, k| h[k] = [] }
@@ -86,6 +86,11 @@ $check_move = [
 
     # find the unique moves and apply them
     moves.select! { |_, elves| elves.size == 1 }
+    unless moves.any?
+        puts round+1
+        break
+    end
+
     moves.each do |npos, elves|
         debug "replacing #{elves.first} with #{npos}"
         $elves.delete elves.first
@@ -96,9 +101,9 @@ $check_move = [
     # rotate the moves
     $check_move.rotate!
 end
-minx, miny, maxx, maxy = borders
-puts (minx..maxx).map { |x|
-    (miny..maxy).map { |y|
-        $elves.include?([x, y]) ? 0 : 1
-    }.sum
-}.sum
+#minx, miny, maxx, maxy = borders
+#puts (minx..maxx).map { |x|
+#    (miny..maxy).map { |y|
+#        $elves.include?([x, y]) ? 0 : 1
+#    }.sum
+#}.sum
