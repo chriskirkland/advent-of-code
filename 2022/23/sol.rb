@@ -57,14 +57,13 @@ $check_move = [
         puts round+1
         break
     end
-    moves.each do |npos, elves|
-        $elves.delete elves.first
+    moves.each do |npos, elf|
+        $elves.delete elf.first
         $elves.add npos
     end
 
     # rotate the moves
     $check_move.rotate!
-
 
     if round+1 == 10
         # part 1
