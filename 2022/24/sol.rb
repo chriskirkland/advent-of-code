@@ -3,7 +3,7 @@ $data = File.read("input.txt").split("\n")
 require 'rb_heap'
 require 'set'
 
-DEBUG = true
+DEBUG = false
 def debug(msg)
     puts msg if DEBUG
 end
@@ -112,31 +112,43 @@ er, ec = 0, $data.first.chars.find_index(".")
 tr, tc = ROWS+1, $data.last.chars.find_index(".")
 debug "expidition start at (#{er},#{ec}), end for (#{tr},#{tc})"
 
-# Walk possible paths, priority queue by minimum possible distance to target
-visited = Set.new
-paths = Heap.new{ |a,b| a.score([tr,tc]) < b.score([tr,tc]) }
-paths << Path.new([[er, ec]])
-while !paths.empty?
-    #debug "num paths remaining: #{paths.size}"
-    path = paths.pop
-    if visited.include? [path.time, path.end]
-        debug "skipping #{path.end} @ #{path.time} minutes"
-        next
-    end
-    visited.add [path.time, path.end]
+def find_shortest_path(start, target, start_time: 0)
+    sr, sc = start
+    tr, tc = target
 
-    er, ec = path.end
-    gix = (path.time+1) % T
-    debug "checking path from (#{er},#{ec}) @ #{path.time} minutes (#{paths.size} remaining)"
-    debug "path length: #{path.time}"
-    if er == tr && ec == tc # found it!
-        puts path.time
-        break
-    end
+    # Walk possible paths, priority queue by minimum possible distance to target
+    visited = Set.new
+    paths = Heap.new{ |a,b| a.score([tr, tc]) < b.score([tr, tc]) }
+    paths << Path.new([[sr, sc]], time: start_time)
+    while !paths.empty?
+        #debug "num paths remaining: #{paths.size}"
+        path = paths.pop
+        if visited.include? [path.time, path.end]
+            debug "skipping #{path.end} @ #{path.time} minutes"
+            next
+        end
+        visited.add [path.time, path.end]
 
-    [N, S, E, W].each do |dir| # try all of the legal moves
-        nr, nc = vadd([er, ec], dir)
-        paths << path.extend(step: [nr, nc]) unless $grid[gix][nr][nc].any?
+        er, ec = path.end
+        gix = (path.time+1) % T
+        debug "checking path from (#{er},#{ec}) @ #{path.time} minutes (#{paths.size} remaining)"
+        debug "path length: #{path.time}"
+        return path.time - start_time if er == tr && ec == tc # found it!
+
+        [N, S, E, W].each do |dir| # try all of the legal moves
+            nr, nc = vadd([er, ec], dir)
+            next if nr < 0 || nr > ROWS+1 || nc < 0 || nc > COLS+1  # out of bounds
+            paths << path.extend(step: [nr, nc]) unless $grid[gix][nr][nc].any?
+        end
+        paths << path.extend unless $grid[gix][er][ec].any?  # to stay put
     end
-    paths << path.extend unless $grid[gix][er][ec].any?  # to stay put
 end
+
+# part 1
+j1 = find_shortest_path([er, ec], [tr, tc])
+puts j1
+
+# part 2
+j2 = find_shortest_path([tr, tc], [er, ec], start_time: j1)
+j3 = find_shortest_path([er, ec], [tr, tc], start_time: j1+j2)
+puts j1 + j2 + j3
