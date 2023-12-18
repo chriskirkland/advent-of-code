@@ -63,8 +63,11 @@ end
 
 # complex case: we ran into cycles on each path, so gotta do some math to speed things
 puts ">> found all cycles after #{step} steps"
+p2 = 1
 cycles.each_with_index do |h, pix|
     h.each do |k, v|
-        puts "[#{pix}] #{k} -> #{v}"
+        p2 = p2.lcm(visited[k])
+        puts "[#{pix}] #{k} + #{visited[k]} -> #{v}"
     end
 end
+puts "p2: #{p2}"
