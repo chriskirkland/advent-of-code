@@ -15,7 +15,11 @@ unless Dir.exists? dir
   puts "✓ created dir #{dir}"
 end
 
-### DOWNLOAD INPUT
+### CREATE SAMPLE INPUT
+File.open(File.join(dir, "sample.txt"), "w") {}
+puts "✓ sample input created"
+
+### DOWNLOAD REAL INPUT
 input_file = File.join(dir, "input.txt")
 unless File.exists? input_file
   raise "😢 SESSION_COOKIE not present. run \n\tsource .env" if SESSION_COOKIE.nil?
@@ -37,11 +41,15 @@ unless File.exists? input_file
   puts "✓ input downloaded"
 end
 
-
 ### SETUP TEMPLATE
 CODE_TEMPLATE = """
 # https://adventofcode.com/2024/day/#{day}
-$data = File.read(\"input.txt\").split(\"\\n\")
+input = ARGV.include?('-s') ?  'sample.txt' : 'input.txt'
+$data = File.read(input).split('\\n')
+
+def debug(msg)
+    puts msg if ARGV.include?('-v')
+end
 
 """.lstrip
 
